@@ -32,7 +32,7 @@ git rev-parse HEAD
 git status
 ```
 
-***NOTYETUSED*** SOP Upload source updates to GitHub
+SOP Upload source updates to GitHub
 -----------------------------------
 ```
 DIR_REPO_NAME=esp32_mosfet_fan_using_lib
