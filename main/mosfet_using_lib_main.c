@@ -70,7 +70,7 @@ void main_task(void *pvParameter) {
      *              for GPIO#4 the func gpio_reset_pin() pulls UP the signal with a "strong" 10-50K Ohm, overriding my "weaker" 1M Ohm pull DOWN, meaning the line is always UP and so the MOSFET is always ON!
      *
      */
-    ESP_LOGI(TAG, "Init POWER MOSFET...");
+    ESP_LOGI(TAG, "Init the ESP32 GPIO driver for the POWER MOSFET...");
 
     gpio_config_t mosfet_config;
 
@@ -88,14 +88,14 @@ void main_task(void *pvParameter) {
         goto cleanup;
     }
 
-    ESP_LOGI(TAG, "Wait 5 seconds before turning the Gate ON");
+    ESP_LOGI(TAG, "Wait 5 seconds before turning the Gate ON...");
     vTaskDelay(RTOS_DELAY_5SEC);
 
     /********************************************************************************
      * Set POWER MOSFET gate := *ON
      *
      */
-    ESP_LOGI(TAG, "POWER MOSFET Gate := *ON (the FAN and LED should turn on)...");
+    ESP_LOGI(TAG, "Set POWER MOSFET Gate := *ON (the FAN and the LED turn on)...");
     f_retval = gpio_set_level(MY_POWER_MOSFET_GATE_GPIO_NUM, 1);
     if (f_retval != ESP_OK) {
         ESP_LOGE(TAG, "%s(). ABORT. gpio_set_level(MY_POWER_MOSFET_GATE_GPIO_NUM) | err %i (%s)", __FUNCTION__, f_retval,
@@ -112,7 +112,7 @@ void main_task(void *pvParameter) {
      * @brief Cut power to the FAN and the external LED.
      *
      */
-    ESP_LOGI(TAG, "POWER MOSFET Gate := *OFF");
+    ESP_LOGI(TAG, "Set POWER MOSFET Gate := *OFF (the FAN and the LED turn off)...");
 
     f_retval = gpio_set_level(MY_POWER_MOSFET_GATE_GPIO_NUM, 0);
     if (f_retval != ESP_OK) {
@@ -122,15 +122,16 @@ void main_task(void *pvParameter) {
         goto cleanup;
     }
 
+    ESP_LOGI(TAG, "Wait 5 seconds whilst the gate is OFF..");
+    vTaskDelay(RTOS_DELAY_5SEC);
+
     /********************************************************************************
      * DEEP SLEEP & RESTART TIMER
      * @important In deep sleep mode, wireless peripherals are powered down. Before entering sleep mode, applications must disable WiFi and BT using appropriate calls (esp_wifi_stop(), esp_bluedroid_disable(), esp_bt_controller_disable()).
      * @doc https://esp-idf.readthedocs.io/en/latest/api-reference/system/sleep_modes.html
      *
-     * The onboard LED turns off automatically.
-     *
      */
-    ESP_LOGI(TAG, "\n\n***SECTION: DEEP SLEEP***");
+    ESP_LOGI(TAG, "\n\n***SECTION: DEEP SLEEP*** (the onboard LED turns off as well)");
 
     mjd_log_memory_statistics();
 
@@ -143,14 +144,14 @@ void main_task(void *pvParameter) {
     }
 
     // @important Give ESP_LOGI() some time to log the information to UART before deep sleep kicks in!
-    ESP_LOGI(TAG, "Entering deep sleep (the MCU should wake up %u seconds later)...\n\n", MY_DEEP_SLEEP_TIME_SEC);
+    ESP_LOGI(TAG, "Entering deep sleep (the MCU will wake up %u seconds later)...\n\n", MY_DEEP_SLEEP_TIME_SEC);
     vTaskDelay(RTOS_DELAY_10MILLISEC);
 
     esp_deep_sleep_start();
 
     /********************************************************************************
      * LABEL
-     * @important I never get to this code if no error occfurs
+     * @important I never get to this code if no error occurs.
      *
      */
     cleanup: ;

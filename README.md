@@ -1,7 +1,7 @@
 ## Project Description esp32_mosfet_fan_using_lib
-This project demonstrates how to use a N Channel MOSFET to power on/off a peripheral. The MOSFET is used to power-down power hungry devices when they are not needed. For example: a GPS device, a 5V fan, a 12V fan.
+This project demonstrates how to use a N Channel MOSFET to power on/off a peripheral. The MOSFET, controlled by the ESP32, is used to power-down power hungry devices when they are not needed. For example: a GPS device, a 5V fan, a 12V fan.
 
-This example uses a MOSFET to turn **a 5V Pi-FAN fan (on the +5V power rail)** and **a standard LED (on the +3.3V power rail)** on and off using a GPIO pin of the microcontroller.
+This example uses a MOSFET to turn **a 5V Pi-FAN fan (on the +5V power rail)** and **a standard LED (on the +3.3V power rail)** on and off using a GPIO pin of the ESP32 microcontroller.
 
 
 
@@ -18,7 +18,7 @@ This example uses a MOSFET to turn **a 5V Pi-FAN fan (on the +5V power rail)** a
 
 
 
-Note: you can omit one of the 2 peripherals (LED, fan) to make it simpler.
+Note: you can omit one of the 2 peripherals (LED / fan) to make it simpler.
 
 
 
@@ -46,25 +46,45 @@ git clone -b v3.2 --recursive https://github.com/espressif/esp-idf.git esp-idf-v
 PIN LAYOUT & WIRING
 
 FAN            => ESP32 Development Board
---------------     -----------------------
-1   Positive       5V/VUSB pin
+--------------    -----------------------
+1   Positive      5V/VUSB pin
 
 LED            => 1K resistor => ESP32 Development Board
 --------------    -----------    -------------
 1   Positive      passthrough    3.3V pin (not the 5V or VUSB pin!)
 
-MOSFET             Destination
-----------------   -----------------------
-1   GATE           ESP32 dev board: GPIO#4 (Adafruit Huzzah32 GPIO#4 = bottomleft-6)
-2   DRAIN          LED: GND
-2   DRAIN          FAN: GND
-3	SOURCE (GND)   ESP32 dev board: GND pin
+MOSFET            Destination
+----------------  -----------------------
+1   GATE          ESP32 dev board: GPIO#4 (Adafruit Huzzah32 GPIO#4 = bottomleft-6)
+2   DRAIN         LED: GND
+2   DRAIN         FAN: GND
+3	SOURCE (GND)  ESP32 dev board: GND pin
 ```
 
 
 
 ## Running the example
 - Run `make flash monitor` to build and upload the example to your board and connect to its serial terminal.
+
+
+
+## The output debug log
+
+```
+I (0) cpu_start: App cpu up.
+...
+I (397) mjd: *** DATETIME 19700101002041 Thu Jan  1 00:20:41 1970
+I (417) gpio: GPIO[13]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0
+I (427) myapp: Init POWER MOSFET...
+I (427) gpio: GPIO[4]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0
+I (437) myapp: Wait 5 seconds before turning the Gate ON
+I (5447) myapp: POWER MOSFET Gate := *ON (the FAN and the LED should turn on)...
+I (5447) myapp: Wait 15 seconds whilst the gate is ON..
+I (20447) myapp: POWER MOSFET Gate := *OFF (the FAN and the LED should turn off)...
+I (20447) myapp: ***SECTION: DEEP SLEEP***
+I (20447) myapp: Entering deep sleep (the MCU should wake up 15 seconds later)...
+
+```
 
 
 
